@@ -3,17 +3,14 @@
 
 import 'package:angular2/core.dart';
 
-class Hero {
-  final int id;
-  String name;
-
-  Hero(this.id, this.name);
-}
+import 'hero.dart';
+import 'hero_detail/hero_detail_component.dart';
 
 @Component(
     selector: 'my-app',
     styleUrls: const ['app_component.css'],
-    templateUrl: 'app_component.html')
+    templateUrl: 'app_component.html',
+    directives: const [HeroDetailComponent])
 class AppComponent {
   final String title = 'Tour of Heroes';
   final List<Hero> heroes = mockHeroes;
