@@ -1,4 +1,5 @@
 import 'package:angular2/core.dart';
+import 'package:angular2/platform/common.dart';
 import 'package:angular2/router.dart';
 
 import 'package:dart_tour_of_heroes/dashboard/dashboard_component.dart';
@@ -11,7 +12,11 @@ import 'package:dart_tour_of_heroes/service/hero_service.dart';
     templateUrl: 'app_component.html',
     styleUrls: const ['app_component.css'],
     directives: const [ROUTER_DIRECTIVES],
-    providers: const [HeroService, ROUTER_PROVIDERS]
+    providers: const [
+      ROUTER_PROVIDERS,
+      const Provider(LocationStrategy, useClass: HashLocationStrategy),
+      HeroService
+    ]
 )
 @RouteConfig(const [
   const Route(
