@@ -1,35 +1,33 @@
-import 'dart:async';
 import 'package:angular2/core.dart';
+import 'package:angular2/router.dart';
 
-import 'hero.dart';
-import 'hero_detail/hero_detail_component.dart';
-import 'service/hero_service.dart';
+import 'package:dart_tour_of_heroes/dashboard/dashboard_component.dart';
+import 'package:dart_tour_of_heroes/hero_detail/hero_detail_component.dart';
+import 'package:dart_tour_of_heroes/heroes/heroes_component.dart';
+import 'package:dart_tour_of_heroes/service/hero_service.dart';
 
 @Component(
     selector: 'my-app',
-    styleUrls: const ['app_component.css'],
     templateUrl: 'app_component.html',
-    directives: const [HeroDetailComponent],
-    providers: const [HeroService])
-class AppComponent implements OnInit {
+    styleUrls: const ['app_component.css'],
+    directives: const [ROUTER_DIRECTIVES],
+    providers: const [HeroService, ROUTER_PROVIDERS]
+)
+@RouteConfig(const [
+  const Route(
+      path: '/dashboard',
+      name: 'Dashboard',
+      component: DashboardComponent,
+      useAsDefault: true),
+  const Route(
+      path: '/heroes',
+      name: 'Heroes',
+      component: HeroesComponent),
+  const Route(
+      path: '/detail/:id',
+      name: 'HeroDetail',
+      component: HeroDetailComponent)
+])
+class AppComponent {
   final String title = 'Tour of Heroes';
-  List<Hero> heroes;
-  Hero selectedHero;
-
-  final HeroService _heroService;
-
-  AppComponent(this._heroService);
-
-  @override
-  ngOnInit() {
-    getHeroes();
-  }
-
-  Future<Null> getHeroes() async {
-    heroes = await _heroService.getHeroes();
-  }
-
-  onSelect(Hero hero) {
-    selectedHero = hero;
-  }
 }
