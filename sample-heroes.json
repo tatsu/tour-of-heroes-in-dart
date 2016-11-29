@@ -1,0 +1,46 @@
+{
+  "app" : {
+    "heroes" : {
+      "-KY2V7jtkPQagx0MLEnu" : {
+        "id" : 11,
+        "name" : "Mr. Nice"
+      },
+      "-KY2V9tS0oxZj3b11X4x" : {
+        "id" : 12,
+        "name" : "Narco"
+      },
+      "-KY2VBrJjC4HqNK58WJW" : {
+        "id" : 13,
+        "name" : "Bombasto"
+      },
+      "-KY2VDmtZ7Qpf0D_45O2" : {
+        "id" : 14,
+        "name" : "Celeritas"
+      },
+      "-KY2VFgX8lwX0WN5knTS" : {
+        "id" : 15,
+        "name" : "Magneta"
+      },
+      "-KY2VHibh_0LjCEoUaaC" : {
+        "id" : 16,
+        "name" : "RubberMan"
+      },
+      "-KY2VJngIrUecvZtJK1H" : {
+        "id" : 17,
+        "name" : "Dynama2"
+      },
+      "-KY2VLnpnHRd0m9TT2TF" : {
+        "id" : 18,
+        "name" : "Dr IQ"
+      },
+      "-KY2VO7B9XQfasJF7PlR" : {
+        "id" : 19,
+        "name" : "Magma"
+      },
+      "-KY2VRm9YBRZ5WpzZ90L" : {
+        "id" : 20,
+        "name" : "Tornado"
+      }
+    }
+  }
+}

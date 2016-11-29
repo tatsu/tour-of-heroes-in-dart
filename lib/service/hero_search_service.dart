@@ -1,29 +1,39 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:angular2/core.dart';
 
-import 'package:http/http.dart';
+import 'package:angular2/core.dart';
+import 'package:firebase3/firebase.dart' as firebase;
 
 import 'package:dart_tour_of_heroes/hero.dart';
 
 @Injectable()
 class HeroSearchService {
-  final Client _http;
+  firebase.Database _fbDatabase;
+  firebase.DatabaseReference _fbRefHeroes;
 
-  HeroSearchService(this._http);
+  HeroSearchService() {
+    _fbDatabase = firebase.database();
+    _fbRefHeroes = _fbDatabase.ref("app/heroes");
+  }
 
   Future<List<Hero>> search(String term) async {
+    final regExp = new RegExp(term, caseSensitive: false);
+
     try {
-      final response = await _http.get('app/heroes/?name=$term');
-      return _extractData(response)
-          .map((json) => new Hero.fromJson(json))
-          .toList();
+      final List<Hero> heroes = [];
+
+      var e = await _fbRefHeroes.onValue.first;
+      await e.snapshot.forEach((child) {
+        Hero hero = new Hero.fromJson(child.val());
+        if (hero.name.contains(regExp)) {
+          heroes.add(hero);
+        }
+      });
+
+      return heroes;
     } catch (e) {
       throw _handleError(e);
     }
   }
-
-  dynamic _extractData(Response resp) => JSON.decode(resp.body)['data'];
 
   Exception _handleError(dynamic e) {
     print(e); // for demo purposes only

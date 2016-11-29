@@ -1,30 +1,36 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:math';
 import 'package:angular2/core.dart';
-
-import 'package:http/http.dart';
+import 'package:firebase3/firebase.dart' as firebase;
 
 import 'package:dart_tour_of_heroes/hero.dart';
 
 @Injectable()
 class HeroService {
-  static const _heroesUrl = 'app/heroes'; // URL to web API
+  firebase.Database _fbDatabase;
+  firebase.DatabaseReference _fbRefHeroes;
+  int _idMax;
 
-  static final _headers = {'Content-Type': 'application/json'};
-
-  final Client _http;
-
-  HeroService(this._http);
+  HeroService() {
+    _fbDatabase = firebase.database();
+    _fbRefHeroes = _fbDatabase.ref("app/heroes");
+  }
 
   Future<Hero> getHero(int id) async =>
       (await getHeroes()).firstWhere((hero) => hero.id == id);
 
   Future<List<Hero>> getHeroes() async {
     try {
-      final response = await _http.get(_heroesUrl);
-      final heroes = _extractData(response)
-          .map((value) => new Hero.fromJson(value))
-          .toList();
+      final List<Hero> heroes = [];
+      _idMax = 0;
+
+      var e = await _fbRefHeroes.onValue.first;
+      e.snapshot.forEach((child) {
+        Hero hero = new Hero.fromJson(child.val());
+        heroes.add(hero);
+        _idMax = max(hero.id, _idMax);
+      });
+
       return heroes;
     } catch (e) {
       throw _handleError(e);
@@ -33,9 +39,9 @@ class HeroService {
 
   Future<Hero> create(String name) async {
     try {
-      final response = await _http.post(_heroesUrl,
-          headers: _headers, body: JSON.encode({'name': name}));
-      return new Hero.fromJson(_extractData(response));
+      Hero hero = new Hero.fromJson({'id': ++_idMax, 'name': name});
+      await _fbRefHeroes.push(hero.toJson());
+      return hero;
     } catch (e) {
       throw _handleError(e);
     }
@@ -43,10 +49,13 @@ class HeroService {
 
   Future<Hero> update(Hero hero) async {
     try {
-      var url = '$_heroesUrl/${hero.id}';
-      final response =
-      await _http.put(url, headers: _headers, body: JSON.encode(hero));
-      return new Hero.fromJson(_extractData(response));
+      var e = await _fbRefHeroes.onValue.first;
+      await e.snapshot.forEach((child) {
+        if (child.val()['id'] == hero.id) {
+          child.ref.update(hero.toJson());
+        }
+      });
+      return hero;
     } catch (e) {
       throw _handleError(e);
     }
@@ -54,14 +63,16 @@ class HeroService {
 
   Future<Null> delete(int id) async {
     try {
-      var url = '$_heroesUrl/$id';
-      await _http.delete(url, headers: _headers);
+      var e = await _fbRefHeroes.onValue.first;
+      await e.snapshot.forEach((child) {
+        if (child.val()['id'] == id) {
+          child.ref.remove();
+        }
+      });
     } catch (e) {
       throw _handleError(e);
     }
   }
-
-  dynamic _extractData(Response resp) => JSON.decode(resp.body)['data'];
 
   Exception _handleError(dynamic e) {
     print(e); // for demo purposes only
