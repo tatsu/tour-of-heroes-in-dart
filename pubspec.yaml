@@ -9,10 +9,12 @@ dependencies:
   stream_transformers: ^0.3.0
   firebase3:
       git: https://github.com/Janamou/firebase3-dart
+  dart_sass_transformer: any
 dev_dependencies:
   browser: ^0.10.0
   dart_to_js_script_rewriter: ^1.0.1
 transformers:
+- dart_sass_transformer
 - angular2:
     platform_directives:
     - 'package:angular2/common.dart#COMMON_DIRECTIVES'

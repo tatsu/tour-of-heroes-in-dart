@@ -3,9 +3,9 @@
     text-decoration: none;
     padding-right: 20px;
     padding-bottom: 20px;
-}
-[class*='col-']:last-of-type {
-    padding-right: 0;
+    &:last-of-type {
+        padding-right: 0;
+    }
 }
 *, *:after, *:before {
     -webkit-box-sizing: border-box;
@@ -32,11 +32,11 @@ h4 {
     min-width: 120px;
     background-color: #607D8B;
     border-radius: 2px;
-}
-.module:hover {
-    background-color: #EEE;
-    cursor: pointer;
-    color: #607d8b;
+    &:hover {
+        background-color: #EEE;
+        cursor: pointer;
+        color: #607d8b;
+    }
 }
 .grid-pad {
     padding: 10px 0;

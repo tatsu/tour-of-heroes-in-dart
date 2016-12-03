@@ -13,6 +13,10 @@ pubspec.lock
 *.js.map
 *.info.json
 
+# Files created by dart-scss
+*.css
+*.css.map
+
 # Directory created by dartdoc
 doc/api/
 
