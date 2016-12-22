@@ -1,5 +1,5 @@
 import 'package:angular2/platform/browser.dart';
-import 'package:firebase3/firebase.dart' as firebase;
+import 'package:firebase/firebase.dart' as firebase;
 
 import 'package:dart_tour_of_heroes/app_component.dart';
 

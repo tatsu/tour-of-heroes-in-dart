@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:angular2/core.dart';
-import 'package:firebase3/firebase.dart' as firebase;
+import 'package:firebase/firebase.dart' as firebase;
 
 import 'package:dart_tour_of_heroes/hero.dart';
 
