@@ -22,7 +22,7 @@ class HeroSearchService {
       final List<Hero> heroes = [];
 
       var e = await _fbRefHeroes.onValue.first;
-      await e.snapshot.forEach((child) {
+      e.snapshot.forEach((child) {
         Hero hero = new Hero.fromJson(child.val());
         if (hero.name.contains(regExp)) {
           heroes.add(hero);

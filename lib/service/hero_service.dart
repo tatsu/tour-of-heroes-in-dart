@@ -9,6 +9,7 @@ import 'package:dart_tour_of_heroes/hero.dart';
 class HeroService {
   firebase.Database _fbDatabase;
   firebase.DatabaseReference _fbRefHeroes;
+  List<Hero> _heroes;
   int _idMax;
 
   HeroService() {
@@ -31,10 +32,30 @@ class HeroService {
         _idMax = max(hero.id, _idMax);
       });
 
-      return heroes;
+      _heroes = heroes;
+
+      /*
+      // Listening for updates
+      _fbRefHeroes.onChildAdded.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        _heroes.add(hero);
+      });
+      _fbRefHeroes.onChildRemoved.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        _heroes.remove(_heroes.firstWhere((h) => h.id == hero.id));
+      });
+      _fbRefHeroes.onChildChanged.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        _heroes
+            .firstWhere((h) => h.id == hero.id)
+            .name = hero.name;
+      });
+      */
     } catch (e) {
       throw _handleError(e);
     }
+
+    return new List<Hero>.from(_heroes);
   }
 
   Future<Hero> create(String name) async {
@@ -49,11 +70,9 @@ class HeroService {
 
   Future<Hero> update(Hero hero) async {
     try {
-      var e = await _fbRefHeroes.onValue.first;
-      await e.snapshot.forEach((child) {
-        if (child.val()['id'] == hero.id) {
-          child.ref.update(hero.toJson());
-        }
+      var e = await _fbRefHeroes.orderByChild('id').equalTo(hero.id).onValue.first;
+      e.snapshot.forEach((child) {
+        child.ref.update(hero.toJson());
       });
       return hero;
     } catch (e) {
@@ -63,11 +82,9 @@ class HeroService {
 
   Future<Null> delete(int id) async {
     try {
-      var e = await _fbRefHeroes.onValue.first;
-      await e.snapshot.forEach((child) {
-        if (child.val()['id'] == id) {
-          child.ref.remove();
-        }
+      var e = await _fbRefHeroes.orderByChild('id').equalTo(id).onValue.first;
+      e.snapshot.forEach((child) {
+        child.ref.remove();
       });
     } catch (e) {
       throw _handleError(e);
