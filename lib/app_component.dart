@@ -11,7 +11,7 @@ import 'package:dart_tour_of_heroes/service/hero_service.dart';
     templateUrl: 'app_component.html',
     styleUrls: const ['app_component.css'],
     directives: const [ROUTER_DIRECTIVES],
-    providers: const [HeroService, ROUTER_PROVIDERS]
+    providers: const [HeroService]
 )
 @RouteConfig(const [
   const Route(
