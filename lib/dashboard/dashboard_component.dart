@@ -23,5 +23,8 @@ class DashboardComponent implements OnInit {
   @override
   Future<Null> ngOnInit() async {
     heroes = (await _heroService.getHeroes()).skip(1).take(4).toList();
+    _heroService.onChanged.listen((heroes) {
+      this.heroes = heroes.skip(1).take(4).toList();
+    });
   }
 }
