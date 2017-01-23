@@ -21,9 +21,21 @@ class HeroService {
     _onChangedController = new StreamController<List<Hero>>.broadcast();
   }
 
-  Future<Hero> getHero(int id) async =>
-      _heroes.firstWhere((hero) => hero.id == id);
-
+  Future<Hero> getHero(int id) async {
+    // It's possible the _heroes is null on the page load.
+    final hero = _heroes?.firstWhere((hero) => hero.id == id);
+    if (hero != null) {
+      return new Future.value(hero);
+    } else {
+      // Try to fetch him from Firebase.
+      // It might not the best design, while Firebase can be expected to handle a cached hero data effectively.
+      // Should be added index on id later.
+      final queryEvent = await _fbRefHeroes.orderByChild('id').equalTo(id).once('value');
+      final snapshot = queryEvent.snapshot.val();
+      return new Hero.fromJson(snapshot.values.first);
+    }
+  }
+  
   Future<List<Hero>> getHeroes() async {
     if (_heroes == null) {
       try {

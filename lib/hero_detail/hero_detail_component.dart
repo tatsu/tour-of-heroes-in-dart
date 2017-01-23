@@ -24,9 +24,10 @@ class HeroDetailComponent implements OnInit {
 
   @override
   Future<Null> ngOnInit() async {
-    var _id = _routeParams.get('id');
-    var id = int.parse(_id ?? '', onError: (_) => null);
-    if (id != null) hero = await (_heroService.getHero(id));
+    var id = _routeParams.get('id');
+    assert(id != null);
+    id = int.parse(id);
+    hero = await _heroService.getHero(id);
   }
 
   void goBack() => _location.back();
