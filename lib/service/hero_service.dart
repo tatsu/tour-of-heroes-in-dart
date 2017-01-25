@@ -7,82 +7,61 @@ import 'package:dart_tour_of_heroes/hero.dart';
 
 @Injectable()
 class HeroService {
-  firebase.Database _fbDatabase;
-  firebase.DatabaseReference _fbRefHeroes;
-  StreamController<List<Hero>> _onChangedController;
-  List<Hero> _heroes;
-  int _idMax;
+  final firebase.DatabaseReference _heroesRef;
+  final List<Hero> heroes = [];
+  int _maxId = 0;
 
-  Stream<List<Hero>> get onChanged => _onChangedController.stream;
+  HeroService() : _heroesRef = firebase.database().ref("app/heroes") {
+    try {
+      /*
+      var e = await _fbRefHeroes.once('value');
+      e.snapshot.forEach((child) {
+        Hero hero = new Hero.fromJson(child.val());
+        _heroes.add(hero);
+        _idMax = max(hero.id, _idMax);
+      });
+      */
 
-  HeroService() {
-    _fbDatabase = firebase.database();
-    _fbRefHeroes = _fbDatabase.ref("app/heroes");
-    _onChangedController = new StreamController<List<Hero>>.broadcast();
+      // Listening for updates
+      _heroesRef.onChildAdded.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        _maxId = max(hero.id, _maxId);
+        heroes.add(hero);
+      });
+      _heroesRef.onChildRemoved.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        heroes.remove(heroes.firstWhere((h) => h.id == hero.id));
+      });
+      _heroesRef.onChildChanged.listen((e) {
+        Hero hero = new Hero.fromJson(e.snapshot.val());
+        heroes
+            .firstWhere((h) => h.id == hero.id)
+            .name = hero.name;
+      });
+    } catch (e) {
+      throw _handleError(e);
+    }
   }
-
+  
   Future<Hero> getHero(int id) async {
-    // It's possible the _heroes is null on the page load.
-    final hero = _heroes?.firstWhere((hero) => hero.id == id);
+    // It's possible the _heroes is not ready on the page load.
+    final hero = heroes.firstWhere((hero) => hero.id == id, orElse: () => null);
     if (hero != null) {
       return new Future.value(hero);
     } else {
       // Try to fetch him from Firebase.
       // It might not the best design, while Firebase can be expected to handle a cached hero data effectively.
       // Should be added index on id later.
-      final queryEvent = await _fbRefHeroes.orderByChild('id').equalTo(id).once('value');
+      final queryEvent = await _heroesRef.orderByChild('id').equalTo(id).once('value');
       final snapshot = queryEvent.snapshot.val();
       return new Hero.fromJson(snapshot.values.first);
     }
   }
   
-  Future<List<Hero>> getHeroes() async {
-    if (_heroes == null) {
-      try {
-        _heroes = [];
-        _idMax = 0;
-
-        /*
-        var e = await _fbRefHeroes.once('value');
-        e.snapshot.forEach((child) {
-          Hero hero = new Hero.fromJson(child.val());
-          _heroes.add(hero);
-          _idMax = max(hero.id, _idMax);
-        });
-        */
-
-        // Listening for updates
-        _fbRefHeroes.onChildAdded.listen((e) {
-          Hero hero = new Hero.fromJson(e.snapshot.val());
-          _idMax = max(hero.id, _idMax);
-          _heroes.add(hero);
-          _onChangedController.add(_heroes);
-        });
-        _fbRefHeroes.onChildRemoved.listen((e) {
-          Hero hero = new Hero.fromJson(e.snapshot.val());
-          _heroes.remove(_heroes.firstWhere((h) => h.id == hero.id));
-          _onChangedController.add(_heroes);
-        });
-        _fbRefHeroes.onChildChanged.listen((e) {
-          Hero hero = new Hero.fromJson(e.snapshot.val());
-          _heroes
-              .firstWhere((h) => h.id == hero.id)
-              .name = hero.name;
-          _onChangedController.add(_heroes);
-        });
-      } catch (e) {
-        throw _handleError(e);
-      }
-    }
-
-    return _heroes;
-    // return new List<Hero>.from(_heroes);
-  }
-
   Future<Hero> create(String name) async {
     try {
-      Hero hero = new Hero.fromJson({'id': ++_idMax, 'name': name});
-      await _fbRefHeroes.push(hero.toJson());
+      Hero hero = new Hero.fromJson({'id': ++_maxId, 'name': name});
+      await _heroesRef.push(hero.toJson());
       return hero;
     } catch (e) {
       throw _handleError(e);
@@ -91,7 +70,7 @@ class HeroService {
 
   Future<Hero> update(Hero hero) async {
     try {
-      var e = await _fbRefHeroes.orderByChild('id').equalTo(hero.id).once('value');
+      var e = await _heroesRef.orderByChild('id').equalTo(hero.id).once('value');
       e.snapshot.forEach((child) {
         child.ref.update(hero.toJson());
       });
@@ -103,7 +82,7 @@ class HeroService {
 
   Future<Null> delete(int id) async {
     try {
-      var e = await _fbRefHeroes.orderByChild('id').equalTo(id).once('value');
+      var e = await _heroesRef.orderByChild('id').equalTo(id).once('value');
       e.snapshot.forEach((child) {
         child.ref.remove();
       });

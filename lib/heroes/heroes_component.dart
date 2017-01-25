@@ -13,24 +13,15 @@ import 'package:dart_tour_of_heroes/service/hero_service.dart';
     styleUrls: const ['heroes_component.css'],
     directives: const [HeroDetailComponent]
 )
-class HeroesComponent implements OnInit {
-  List<Hero> heroes;
+class HeroesComponent {
+  List<Hero> get heroes => _heroService.heroes;
   Hero selectedHero;
 
   final HeroService _heroService;
   final Router _router;
 
   HeroesComponent(this._heroService, this._router);
-
-  @override
-  ngOnInit() {
-    getHeroes();
-  }
-
-  Future<Null> getHeroes() async {
-    heroes = await _heroService.getHeroes();
-  }
-
+  
   Future<Null> add(String name) async {
     name = name.trim();
     if (name.isEmpty) return;

@@ -11,12 +11,11 @@ import 'package:dart_tour_of_heroes/service/hero_search_service.dart';
     selector: 'hero-search',
     templateUrl: 'hero_search_component.html',
     styleUrls: const ['hero_search_component.css'],
-    providers: const [HeroSearchService]
-)
+    providers: const [HeroSearchService])
 class HeroSearchComponent implements OnInit {
   Stream<List<Hero>> heroes;
   StreamController<String> _searchTerms =
-  new StreamController<String>.broadcast();
+      new StreamController<String>.broadcast();
 
   final HeroSearchService _heroSearchService;
   final Router _router;
@@ -32,8 +31,9 @@ class HeroSearchComponent implements OnInit {
         .transform(new Debounce(new Duration(milliseconds: 300)))
         .distinct()
         .transform(new FlatMapLatest((term) => term.isEmpty
-        ? new Stream<List<Hero>>.fromIterable([<Hero>[]])
-        : _heroSearchService.search(term).asStream()))
+            ? new Stream<List<Hero>>.fromIterable([<Hero>[]])
+            : new Future<List<Hero>>.sync(() => _heroSearchService.search(term))
+                .asStream()))
         .handleError((e) {
       print(e); // for demo purposes only
     });
